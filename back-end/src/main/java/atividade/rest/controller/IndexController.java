@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import atividade.rest.model.Atividade;
 import atividade.rest.model.GrupoDeAtividade;
+import atividade.rest.repository.AtividadeRepository;
 import atividade.rest.repository.GrupoDeAtividadeRepository;
 
 @CrossOrigin
@@ -26,6 +28,9 @@ public class IndexController {
 	
 	@Autowired
 	private GrupoDeAtividadeRepository grupoDeAtividadeRepository;
+	
+	@Autowired
+	private AtividadeRepository atividadeRepository;
 	
 	@GetMapping(value = "/{id}", produces = "application/json")
 	public ResponseEntity<GrupoDeAtividade> init(@PathVariable (value = "id") Long id) {
@@ -56,10 +61,43 @@ public class IndexController {
 			grupodeatividade.getAtividades().get(pos).setGrupodeatividade(grupodeatividade);
 		}
 		
+		grupodeatividade.setTitulodogrupo(grupodeatividade.getTitulodogrupo());
 		GrupoDeAtividade grupoSalvo = grupoDeAtividadeRepository.save(grupodeatividade);
 		
 		return new ResponseEntity<GrupoDeAtividade>(grupoSalvo, HttpStatus.OK);
 	}
+	
+	@PutMapping(value = "/{id}", produces = "application/json")
+	public ResponseEntity atualizarAtividade(@PathVariable (value = "id") Long id, @RequestBody Atividade atividade){
+		
+		Optional<Atividade> atividades = atividadeRepository.findById(id);
+		
+		
+		atividades.get().setTitulo(atividade.getTitulo());
+		atividade.setGrupodeatividade(atividades.get().getGrupodeatividade());
+		
+		Atividade atividadeSalva = atividadeRepository.save(atividade);
+		
+		return new ResponseEntity<Atividade>(atividadeSalva, HttpStatus.OK);
+	}
+	
+	/*
+	@PutMapping(value = "/{id}", produces = "application/json")
+	public ResponseEntity atualizarAtividade(@PathVariable (value = "id") Long id, @RequestBody Atividade atividade){
+		
+		Optional<GrupoDeAtividade> grupoDeAtividade = grupoDeAtividadeRepository.findById(id);
+		
+		atividade.setTitulo(atividade.getTitulo());
+		
+		atividade.setGrupodeatividade(grupoDeAtividade.get());
+		
+		Atividade atividadeSalva = atividadeRepository.save(atividade);
+		
+		
+		return new ResponseEntity<Atividade>(atividadeSalva, HttpStatus.OK);
+	}*/
+	
+	
 	
 	@PostMapping(value = "/", produces = "application/json")
 	public ResponseEntity cadastrar(@RequestBody GrupoDeAtividade grupodeatividade){
@@ -68,9 +106,26 @@ public class IndexController {
 			grupodeatividade.getAtividades().get(pos).setGrupodeatividade(grupodeatividade);
 		}
 		
+		grupodeatividade.setTitulodogrupo(grupodeatividade.getTitulodogrupo());
 		GrupoDeAtividade grupoSalvo = grupoDeAtividadeRepository.save(grupodeatividade);
 		
+		
 		return new ResponseEntity<GrupoDeAtividade>(grupoSalvo, HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/{id}", produces = "application/json")
+	public ResponseEntity cadastrarAtividade(@PathVariable (value = "id") Long id, @RequestBody Atividade atividade){
+		
+		Optional<GrupoDeAtividade> grupoDeAtividade = grupoDeAtividadeRepository.findById(id);
+		
+		atividade.setTitulo(atividade.getTitulo());
+		
+		atividade.setGrupodeatividade(grupoDeAtividade.get());
+		
+		Atividade atividadeSalva = atividadeRepository.save(atividade);
+		
+		
+		return new ResponseEntity<Atividade>(atividadeSalva, HttpStatus.OK);
 	}
 
 }
